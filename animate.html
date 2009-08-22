@@ -3,55 +3,67 @@
 <script type="text/javascript">
 var intervalTimer;
 function go() {
-  intervalTimer = setInterval(animate, 5);
-  var linear = document.getElementById("linear");
-  var smooth = document.getElementById("smooth");
-  var x = 0;
-  var scale = 100;
-  var add;
+    intervalTimer = setInterval(animate, 5);
+    var linear = document.getElementById("linear");
+    var smooth = document.getElementById("smooth");
+    var x = 0;
+    var scale = 100;
+    var add;
 
-  function animate() {
-    linear.style.left = x + "px";
+    function animate() {
+        linear.style.left = x + "px";
 
-    // formula: 1/2 cos(x*pi) + 1/2
-    // multiply by 1/2 so difference between max y and min y is 1 rather than 2
-    // cos(0*pi) = 1      1/2 cos(0*pi) = 1/2
-    // cos(1*pi) = -1     1/2 cos(1*pi) = -1/2
-    // add 1/2 so the number is not negative
-    // x in above formula is from 0 to 1
-    // our real x is from, for example, 0 to 100, so divide by scale to get 0 to 1
-    var y = (0.5 * Math.cos(x / scale * Math.PI)) + 0.5;
+        // formula: 1/2 cos(x*pi) + 1/2
+        //
+        // Explanation of formula:
+        // Normal cos returns values between -1 and 1. However, we want maxY - minY to
+        // equal 1, rather than 2 (which is what 1 - -1 would be). Multiply by 1/2 so
+        // the difference between maxY and minY equals 1. (maxY = 1/2 and minY = -1/2)
+        //
+        // Add 1/2 so the number is not negative (maxY = 1 and minY = 0)
+        //
+        // x in the formula is the value we change each iteration. It ranges from 0 to 1
+        //    max                           min
+        // cos(0*pi) = 1               cos(1*pi) = -1 
+        // 1/2 cos(0*pi) + 1/2 = 1     1/2 cos(1*pi) + 1/2 = 0
+        //
+        // Our real x may be, for example, 0 to 100 pixels (our scale) so divide by scale to
+        // convert (0 to 100) to (0 to 1)
+        var y = (0.5 * Math.cos(x / scale * Math.PI)) + 0.5;
 
-    // cos starts at 1 and goes to 0, but we want 0 to 1, so invert it
-    var inverse = 1 - y;
+        // the formula starts at 1 and goes to 0, but we want 0 to 1, so invert it
+        var inverse = 1 - y;
 
-    // multiply by scale since our value is from 0 to 1, but we want, for example, 0 to 100
-    var smoothPos = inverse * scale;
-    smooth.style.left = smoothPos + "px";
+        // multiply by scale since the output of the formula is from 0 to 1, but we want a value in pixels
+        var smoothPos = inverse * scale;
+        smooth.style.left = smoothPos + "px";
 
-    if (x == scale) {
-      add = false;  
-    } else if (x == 0) {
-      add = true;
+        if (x == scale) {
+            add = false;  
+        } else if (x == 0) {
+            add = true;
+        }
+
+        // setup x for the next run through
+        if (add) {
+            x++;
+        } else {
+            x--;
+        }
     }
-
-    if (add) {
-      x++;
-    } else {
-      x--;
-    }
-  }
 }
+
 function stop() {
-  clearInterval(intervalTimer);
+    clearInterval(intervalTimer);
 }
 </script>
 </head>
-<body onload="go()">
-<button id="linear" style="position:absolute; width:75px;" onclick="stop();">linear</button
-<br/>
-<br/>
-<button id="smooth" style="position:absolute; width:75px;" onclick="stop();">smooth</button>
+
+<body onload="go();">
+    <button id="linear" style="position:absolute; width:75px;" onclick="stop();">linear</button>
+    <br/>
+    <br/>
+    <button id="smooth" style="position:absolute; width:75px;" onclick="stop();">smooth</button>
 </body>
 </html>
 
